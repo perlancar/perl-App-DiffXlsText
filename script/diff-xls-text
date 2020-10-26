@@ -143,7 +143,8 @@ Use like you would use the Unix command B<diff>:
 This is a wrapper for the Unix command B<diff>. It assumes that each file is an
 Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to a
 directory of CSV files (where each CSV file is converted from single a
-worksheet). It then passes the converted directories to C<< diff -ruN>> command.
+worksheet). It then passes the converted directories to C<< diff -ruN >>
+command.
 
 
 =head1 ENVIRONMENT
