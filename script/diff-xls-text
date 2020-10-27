@@ -12,7 +12,13 @@ use Log::ger;
 #use Log::ger::Screen;
 
 use File::Temp qw(tempdir);
+use File::Which qw(which);
 use Getopt::Long;
+use IPC::System::Options 'system', -log=>1, -die=>1;
+
+unless (which "xls2csv") {
+    die "diff-xls-text: This tool requires xls2csv from CPAN module Spreadsheet::Read\n";
+}
 
 my @files;
 Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
@@ -23,7 +29,7 @@ my $code_push_opt_val = sub { my ($cb, $optval) = @_; my $optname = $cb->name; p
 my $fail;
 
 my $tempdir;
-my %dirnames;
+my %basenames;
 
 GetOptions(
     normal => $code_push_opt,
@@ -87,31 +93,17 @@ GetOptions(
             $tempdir = File::Temp::tempdir(CLEANUP => !$ENV{DEBUG});
         }
 
-        (my $dirname0 = $filename) =~ s!.+/!!;
-        my $dirname;
+        (my $basename0 = $filename) =~ s!.+/!!;
+        my $basename;
         my $i = 0;
         while (1) {
-            $dirname = $dirname0 . ($i++ ? ".$i" : "");
-            last unless $dirnames{ $dirname }++;
+            $basename = $basename0 . ($i++ ? ".$i" : "");
+            last unless $basenames{ $basename }++;
         }
 
-        require App::OfficeUtils;
-        my $res = App::OfficeUtils::officess2csv(
-            input_file => $filename,
-            always_dir => 1,
-            overwrite => 1,
-            all_worksheets => 1,
-            output_file_or_dir => "$tempdir/$dirname",
-        );
-        my $file;
-        if ($res->[0] == 304) {
-            $file = $_[0];
-        } elsif ($res->[0] == 200) {
-            $file = $res->[2];
-        } else {
-            die "Can't convert xls '$_[0]' to csv: $res->[0] - $res->[1]";
-        }
-        push @diff_argv, "$tempdir/$dirname";
+        mkdir "$tempdir/$basename";
+        system "xls2csv", "-A", "-o", "$tempdir/$basename/workbook", $filename;
+        push @diff_argv, "$tempdir/$basename";
     },
 );
 
@@ -140,11 +132,11 @@ Use like you would use the Unix command B<diff>:
 
 =head1 DESCRIPTION
 
-This is a wrapper for the Unix command B<diff>. It assumes that each file is an
-Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to a
-directory of CSV files (where each CSV file is converted from single a
-worksheet). It then passes the converted directories to C<< diff -ruN >>
-command.
+This is a wrapper for the Unix command B<diff>. It assumes that each input file
+is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
+a directory of CSV files (where each CSV file is converted from a single
+worksheet) using L<xls2csv>. It then passes the converted directories to C<<
+diff -ruN >> command.
 
 
 =head1 ENVIRONMENT
@@ -163,4 +155,7 @@ available in PATH, or C<diff>.
 
 Unix command L<diff>.
 
-L<App::OfficeUtils> and the included CLI L<xls2csv>.
+L<ssdiff> from L<Spreadsheet::Read> which also diffs two spreadsheets but
+presents the result differently.
+
+L<xls2csv> from L<Spreadsheet::Read>
