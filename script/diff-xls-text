@@ -113,7 +113,7 @@ GetOptions(
         if ($opt_transpose_csv) {
             log_trace "Transposing CSV files in $tempdir/$basename ...";
             local $CWD = "$tempdir/$basename";
-            for my $file (<*.csv>) {
+            for my $file (glob "*.csv") {
                 (my $newfile = $file) =~ s/\.csv$/.transpose.csv/;
                 system({shell=>1}, "csv-transpose", $file, \">", $newfile);
                 unlink $file;
