@@ -11,6 +11,7 @@ use warnings;
 use Log::ger;
 #use Log::ger::Screen;
 
+use File::chdir;
 use File::Temp qw(tempdir);
 use File::Which qw(which);
 use Getopt::Long;
@@ -27,6 +28,7 @@ my @diff_argv;
 my $code_push_opt     = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @diff_argv, (length($optname) > 1 ? "--" : "-").$optname };
 my $code_push_opt_val = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @diff_argv, (length($optname) > 1 ? "--" : "-").$optname, $optval };
 my $fail;
+my $opt_transpose_csv;
 
 my $tempdir;
 my %basenames;
@@ -81,6 +83,9 @@ GetOptions(
     'help' => $code_push_opt,
     'version|v' => $code_push_opt,
 
+    # our own options
+    'transpose-csv' => \$opt_transpose_csv,
+
     '<>' => sub {
         my $filename = $_[0];
         unless (-f $filename) {
@@ -104,6 +109,16 @@ GetOptions(
         mkdir "$tempdir/$basename";
         system "xls2csv", "-A", "-o", "$tempdir/$basename/workbook", $filename;
         push @diff_argv, "$tempdir/$basename";
+
+        if ($opt_transpose_csv) {
+            log_trace "Transposing CSV files in $tempdir/$basename ...";
+            local $CWD = "$tempdir/$basename";
+            for my $file (<*.csv>) {
+                (my $newfile = $file) =~ s/\.csv$/.transpose.csv/;
+                system({shell=>1}, "csv-transpose", $file, \">", $newfile);
+                unlink $file;
+            }
+        }
     },
 );
 
@@ -137,6 +152,23 @@ is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
 a directory of CSV files (where each CSV file is converted from a single
 worksheet) using L<xls2csv>. It then passes the converted directories to C<<
 diff -ruN >> command.
+
+
+=head1 OPTIONS
+
+These are options that are interpreted by B<diff-xls-text> and not passed to
+B<diff>.
+
+B<Please specify these options before file names.>
+
+=over
+
+=item * --transpose-csv
+
+Transpose CSV first using L<csv-transpose> from L<App::CSVUtils>. This allows
+you to do column-based instead of row-based diff.
+
+=back
 
 
 =head1 ENVIRONMENT
