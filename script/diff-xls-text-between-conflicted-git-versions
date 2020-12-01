@@ -62,7 +62,9 @@ GetOptionsCLIWrapper(
 
 die "Please specify file" unless defined $path_ours;
 system(
-    "diff-xls-text", @ARGV, $path_ours, $path_theirs,
+    "diff-xls-text", @ARGV,
+    ($opt_transpose_csv ? ("--transpose-csv") : ()),
+    $path_ours, $path_theirs,
 );
 
 # ABSTRACT: Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as two directories of CSV files
