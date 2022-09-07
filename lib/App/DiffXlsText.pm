@@ -1,5 +1,7 @@
 package App::DiffXlsText;
 
+use strict;
+
 # AUTHORITY
 # DATE
 # DIST

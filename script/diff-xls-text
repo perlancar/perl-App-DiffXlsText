@@ -1,10 +1,5 @@
 #!perl
 
-# AUTHORITY
-# DATE
-# DIST
-# VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -18,8 +13,13 @@ use File::Which qw(which);
 use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
-unless (which "xls2csv") {
-    die "diff-xls-text: This tool requires xls2csv from CPAN module Spreadsheet::Read\n";
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+unless (which "xlsx2csv") {
+    die "diff-xls-text: This tool requires xlsx2csv from CPAN module Spreadsheet::Read\n";
 }
 
 my @files;
@@ -31,7 +31,7 @@ my $opt_transpose_csv;
 my $tempdir;
 my %basenames;
 
-my $has_checked_xls2csv;
+my $has_checked_xlsx2csv;
 GetOptionsCLIWrapper(
     cli => 'diff',
     add_opts => {
@@ -58,17 +58,17 @@ GetOptionsCLIWrapper(
                 last unless $basenames{ $basename }++;
             }
 
-            unless ($has_checked_xls2csv++) {
-                my $content = read_binary(which "xls2csv");
+            unless ($has_checked_xlsx2csv++) {
+                my $content = read_binary(which "xlsx2csv");
                 unless ($content =~ /use Spreadsheet::Read/) {
-                    warn "diff-xls-text: xls2csv in PATH doesn't seem to be the one from Spreadsheet::Read, please make sure we have the correct xls2csv\n";
+                    warn "diff-xls-text: xlsx2csv in PATH doesn't seem to be the one from Spreadsheet::Read, please make sure we have the correct xlsx2csv\n";
                     $fail++;
                     return;
                 }
             }
 
             mkdir "$tempdir/$basename";
-            system "xls2csv", "-A", "-o", "$tempdir/$basename/workbook", $filename;
+            system "xlsx2csv", "-A", "-o", "$tempdir/$basename/workbook", $filename;
             push @CLI::MetaUtil::Getopt::Long::cli_argv, "$tempdir/$basename";
 
             if ($opt_transpose_csv) {
@@ -113,7 +113,7 @@ Use like you would use the Unix command B<diff>:
 This is a wrapper for the Unix command B<diff>. It assumes that each input file
 is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
 a directory of CSV files (where each CSV file is converted from a single
-worksheet) using L<xls2csv>. It then passes the converted directories to C<<
+worksheet) using L<xlsx2csv>. It then passes the converted directories to C<<
 diff -ruN >> command.
 
 
@@ -158,4 +158,4 @@ Unix command L<diff>.
 L<ssdiff> from L<Spreadsheet::Read> which also diffs two spreadsheets but
 presents the result differently.
 
-L<xls2csv> from L<Spreadsheet::Read>
+L<xlsx2csv> from L<Spreadsheet::Read>
