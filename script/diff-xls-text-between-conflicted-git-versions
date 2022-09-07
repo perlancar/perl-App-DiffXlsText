@@ -1,10 +1,5 @@
 #!perl
 
-# AUTHORITY
-# DATE
-# DIST
-# VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -14,6 +9,11 @@ use Log::ger;
 use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 use File::Temp qw(tempdir);
 use IPC::System::Options 'system', -log=>1, -die=>1;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 # XXX duplication with diff-xls-text
 my $opt_transpose_csv;
