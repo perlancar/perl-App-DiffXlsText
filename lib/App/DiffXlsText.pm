@@ -19,4 +19,6 @@ See the included script L<diff-xls-text>.
 
 L<App::DiffDocText>
 
+L<App::DiffPDFText>
+
 =cut
