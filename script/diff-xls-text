@@ -140,7 +140,7 @@ you to do column-based instead of row-based diff.
 
 If set to true, do not cleanup temporary directories.
 
-=head1 DIFF_CMD
+=head2 DIFF_CMD
 
 String. Can be used to set path to diff command. See also
 L</DIFF_XLS_TEXT_DIFF_CMD> which takes precedence.
