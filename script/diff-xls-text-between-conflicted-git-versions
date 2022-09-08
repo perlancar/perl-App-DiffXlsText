@@ -67,7 +67,7 @@ system(
     $path_ours, $path_theirs,
 );
 
-# ABSTRACT: Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as two directories of CSV files
+# ABSTRACT: Diff the text of Office spreadsheets (.ods, .xls, .xlsx) as directories of CSV files between conflicted git versions
 # PODNAME:
 
 =head1 SYNOPSIS
