@@ -14,4 +14,9 @@ use strict;
 
 See the included script L<diff-xls-text>.
 
+
+=head1 SEE ALSO
+
+L<App::DiffDocText>
+
 =cut
